@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.gameMap">
+	<insert id="checkScoreRSP" parameterType="String">
+		 INSERT INTO alt.rsp (p_name)
+        SELECT #{lId}
+        WHERE NOT EXISTS (SELECT 1 FROM alt.rsp WHERE p_name = #{lId});
+	</insert>
+	<insert id="insertHand" parameterType="gameVO">
+		INSERT INTO alt.game (p_name, b_type, ro_lr, g_hand, g_num) VALUES (#{p_name}, #{b_type}, #{ro_lr}, #{g_hand}, #{g_num})
+	</insert>
+	<select id="getScoreRSP" parameterType="String" resultType="gameVO">
+		 SELECT rsp.*, players.p_level, players.p_maxHp, players.p_curHp,
+               players.p_str, players.p_dex, players.p_int, players.p_luk,
+               players.p_exp, players.p_balance
+        FROM alt.rsp rsp
+        LEFT JOIN alt.players ON rsp.p_name = players.p_name
+        WHERE rsp.p_name = #{pName};
+	</select>
+	<select id="giveHand" parameterType="gameVO" resultType="gameVO">
+		SELECT * FROM alt.game WHERE g_num = #{g_num} order by g_id DESC LIMIT 2
+	</select>
+	<delete id="deleteHand" parameterType="String">
+		DELETE FROM alt.game WHERE p_name =#{sources}
+	</delete>
+	<select id="getCoonectedUser" parameterType="logVO" resultType="logVO">
+		SELECT * FROM alt.rooms WHERE  l_room = #{l_room} and b_type = #{b_type}
+	</select>
+	<update id="updateScore" parameterType="map">
+		 UPDATE alt.rsp
+    <set>
+        <if test="string == 'r_win'"> r_win = r_win + 1, </if>
+        <if test="string == 'r_lose'"> r_lose = r_lose + 1, </if>
+        <if test="string == 'r_draw'"> r_draw = r_draw + 1, </if>
+    </set>
+    WHERE p_name = #{p_name}
+	</update>
+	<update id="updateExp" parameterType="map">
+		UPDATE alt.players SET p_exp = p_exp + #{p_exp}  WHERE p_name = #{p_name}
+	</update>
+</mapper>

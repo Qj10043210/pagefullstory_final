@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.logMap">
+	<delete id="clearLog" parameterType="logVO">
+		DELETE FROM alt.logged where l_type = "ENTER" and p_name = #{p_name}
+	</delete>
+	<delete id="clearLogPlayer" parameterType="logVO">
+		DELETE FROM alt.logged where p_name = #{p_name}
+	</delete>
+	<delete id="clearLogAll" parameterType="logVO">
+		DELETE FROM alt.logged where l_type = "ENTER" and l_room = #{l_room}
+	</delete>
+	<insert id="recordIn" parameterType="logVO">
+		 INSERT INTO alt.logged (b_type,l_room,p_name,l_type) VALUES (#{b_type},#{l_room},#{p_name},#{l_type})
+	</insert>
+	<select id="checkRecentN" parameterType="logVO" resultType="Integer">
+		SELECT COUNT(*) FROM alt.logged WHERE  l_room = #{l_room}
+	</select>
+	<select id="checkRecentName" parameterType="logVO" resultType="String">
+		SELECT p_name FROM alt.logged WHERE  l_room = #{l_room} LIMIT 1
+	</select>
+	<select id="checkRecent" parameterType="logVO" resultType="String">
+		SELECT l_type FROM alt.logged WHERE l_room = #{l_room} ORDER BY l_id DESC LIMIT 1
+	</select>
+	<select id="checkTRecent" parameterType="logVO" resultType="logVO">
+		SELECT l_createdat, l_id FROM alt.logged WHERE l_room = #{l_room} ORDER BY l_id DESC LIMIT 1
+	</select>
+	<update id="updateType" parameterType="int">
+		UPDATE alt.logged SET l_type = "EXIT" WHERE l_id = #{l_id} 
+	</update>
+	<select id="checkLR" parameterType="logVO" resultType="logVO">
+		SELECT ro_lr FROM alt.rooms WHERE l_room = #{l_room}
+	</select>
+	<select id="checkRoom" parameterType="logVO" resultType="Integer">
+		SELECT COUNT(*) FROM alt.rooms WHERE p_name = #{p_name}
+	</select>
+	<delete id="clearRoom" parameterType="logVO">
+		DELETE FROM alt.rooms where p_name = #{p_name}
+	</delete>
+	<insert id="joinRoom" parameterType="logVO">
+		 INSERT INTO alt.rooms (l_room,ro_lr,b_type,p_name) VALUES (#{l_room},#{ro_lr},#{b_type},#{p_name})
+	</insert>
+	
+	<select id="checkReady" parameterType="logVO" resultType="Integer">
+		SELECT ro_re FROM alt.rooms where p_name=#{p_name}
+	</select>
+	<update id="readySitu" parameterType="logVO">
+		UPDATE alt.rooms SET ro_re = #{ro_re} WHERE p_name=#{p_name};
+	</update>
+	<select id="loadReadyPlayer" resultType="logVO">
+		SELECT *
+FROM alt.rooms
+WHERE ro_re = 1 AND l_room IN (
+    SELECT l_room
+    FROM alt.rooms
+    WHERE ro_re = 1
+    GROUP BY l_room
+    HAVING COUNT(*) > 1
+)
+AND l_room NOT IN (
+    SELECT l_room
+    FROM alt.board
+    WHERE b_playing = 1
+)
+		
+	</select>
+	<select id="updatedReady" parameterType="logVO" resultType="logVO">
+		SELECT * FROM alt.rooms WHERE l_room = #{l_room} and b_type = #{b_type}
+	</select>
+	
+</mapper>

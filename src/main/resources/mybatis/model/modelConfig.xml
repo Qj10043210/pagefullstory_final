@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		
+		<typeAlias type="com.ajar.pagefullstory.client.ClientVO" alias="clientVO" />
+		<typeAlias type="com.ajar.pagefullstory.game.GameVO" alias="gameVO" />
+		<typeAlias type="com.ajar.pagefullstory.board.BoardVO" alias="boardVO" />
+		<typeAlias type="com.ajar.pagefullstory.log.LogVO" alias="logVO" />
+	</typeAliases>
+	
+</configuration>
